@@ -28,13 +28,17 @@ import java.util.function.Supplier;
 
 @Mixin(World.class)
 public abstract class WorldMixin implements LocalizedWeatherWorld {
-    @Shadow public abstract Random getRandom();
+    @Shadow
+    public abstract Random getRandom();
 
-    @Shadow public abstract GameRules getGameRules();
+    @Shadow
+    public abstract GameRules getGameRules();
 
-    @Shadow public abstract RegistryKey<World> getRegistryKey();
+    @Shadow
+    public abstract RegistryKey<World> getRegistryKey();
 
-    @Shadow public abstract long getTime();
+    @Shadow
+    public abstract long getTime();
 
     @Unique
     public WeatherManager localizedweather$weatherManager;

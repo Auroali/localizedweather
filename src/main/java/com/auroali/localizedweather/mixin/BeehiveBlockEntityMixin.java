@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 public class BeehiveBlockEntityMixin {
     @WrapOperation(method = "releaseBee", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;isRaining()Z"))
     private static boolean localizedweather$modifyBeehiveRainCheck(World instance, Operation<Boolean> original, @Local(argsOnly = true, ordinal = 0) BlockPos pos) {
-        WeatherManager weatherManager = ((LocalizedWeatherWorld)instance).localizedweather$getWeatherManager();
+        WeatherManager weatherManager = ((LocalizedWeatherWorld) instance).localizedweather$getWeatherManager();
         return weatherManager.isStormingAt(pos);
     }
 }

@@ -19,7 +19,7 @@ public abstract class BeeEntityMixin extends AnimalEntity {
 
     @WrapOperation(method = "canEnterHive", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;isRaining()Z"))
     public boolean localizedweather$modifyBeeRainCheck(World instance, Operation<Boolean> original) {
-        WeatherManager weatherManager = ((LocalizedWeatherWorld)instance).localizedweather$getWeatherManager();
+        WeatherManager weatherManager = ((LocalizedWeatherWorld) instance).localizedweather$getWeatherManager();
         return weatherManager.isStormingAt(this.getPos());
     }
 }

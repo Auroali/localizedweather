@@ -18,30 +18,30 @@ public class WeatherCheckLootConditionMixin {
     @WrapOperation(method = "test(Lnet/minecraft/loot/context/LootContext;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;isRaining()Z"))
     public boolean localizedweather$modifyWeatherLootConditionRainCheck(ServerWorld instance, Operation<Boolean> original, @Local(argsOnly = true) LootContext context) {
         Vec3d position = context.get(LootContextParameters.ORIGIN);
-        if(position == null && context.get(LootContextParameters.THIS_ENTITY) != null)
+        if (position == null && context.get(LootContextParameters.THIS_ENTITY) != null)
             position = context.get(LootContextParameters.THIS_ENTITY).getPos();
-        else if(position == null && context.get(LootContextParameters.BLOCK_ENTITY) != null)
+        else if (position == null && context.get(LootContextParameters.BLOCK_ENTITY) != null)
             position = context.get(LootContextParameters.BLOCK_ENTITY).getPos().toCenterPos();
 
-        if(position == null)
+        if (position == null)
             return false;
 
-        WeatherManager weatherManager = ((LocalizedWeatherWorld)instance).localizedweather$getWeatherManager();
+        WeatherManager weatherManager = ((LocalizedWeatherWorld) instance).localizedweather$getWeatherManager();
         return weatherManager.isStormingAt(position);
     }
 
     @WrapOperation(method = "test(Lnet/minecraft/loot/context/LootContext;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;isThundering()Z"))
     public boolean localizedweather$modifyWeatherLootConditionThunderCheck(ServerWorld instance, Operation<Boolean> original, @Local(argsOnly = true) LootContext context) {
         Vec3d position = context.get(LootContextParameters.ORIGIN);
-        if(position == null && context.get(LootContextParameters.THIS_ENTITY) != null)
+        if (position == null && context.get(LootContextParameters.THIS_ENTITY) != null)
             position = context.get(LootContextParameters.THIS_ENTITY).getPos();
-        else if(position == null && context.get(LootContextParameters.BLOCK_ENTITY) != null)
+        else if (position == null && context.get(LootContextParameters.BLOCK_ENTITY) != null)
             position = context.get(LootContextParameters.BLOCK_ENTITY).getPos().toCenterPos();
 
-        if(position == null)
+        if (position == null)
             return false;
 
-        WeatherManager weatherManager = ((LocalizedWeatherWorld)instance).localizedweather$getWeatherManager();
+        WeatherManager weatherManager = ((LocalizedWeatherWorld) instance).localizedweather$getWeatherManager();
         return weatherManager.isThunderingAt(position);
     }
 }

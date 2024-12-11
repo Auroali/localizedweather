@@ -1,33 +1,33 @@
 {
-	"schemaVersion": 1,
-	"id": "localizedweather",
-	"version": "${version}",
-	"name": "Localized Weather",
-	"description": "Adds localized weather to the game",
-	"authors": [
-		"Auroali"
-	],
-	"contact": {
-		"sources": "https://github.com/Auroali/localized-weather"
-	},
-	"license": "MIT",
-	"icon": "assets/localizedweather/icon.png",
-	"environment": "*",
-	"entrypoints": {
-		"main": [
-			"com.auroali.localizedweather.LocalizedWeather"
-		],
-		"client": [
-			"com.auroali.localizedweather.LocalizedWeatherClient"
-		]
-	},
-	"mixins": [
-		"localizedweather.mixins.json"
-	],
-	"depends": {
-		"fabricloader": ">=0.16.9",
-		"minecraft": "~1.20.1",
-		"java": ">=17",
-		"fabric-api": "*"
-	}
+  "schemaVersion": 1,
+  "id": "localizedweather",
+  "version": "${version}",
+  "name": "Localized Weather",
+  "description": "Adds localized weather to the game",
+  "authors": [
+    "Auroali"
+  ],
+  "contact": {
+    "sources": "https://github.com/Auroali/localized-weather"
+  },
+  "license": "MIT",
+  "icon": "assets/localizedweather/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.auroali.localizedweather.LocalizedWeather"
+    ],
+    "client": [
+      "com.auroali.localizedweather.LocalizedWeatherClient"
+    ]
+  },
+  "mixins": [
+    "localizedweather.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.9",
+    "minecraft": "~1.20.1",
+    "java": ">=17",
+    "fabric-api": "*"
+  }
 }

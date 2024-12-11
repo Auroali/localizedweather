@@ -25,25 +25,25 @@ public class LocalizedWeatherClient implements ClientModInitializer {
     public void onInitializeClient() {
         ClientPlayNetworking.registerGlobalReceiver(AddStormS2C.ID, (addStormS2C, clientPlayerEntity, packetSender) -> {
             World world = clientPlayerEntity.getWorld();
-            WeatherManager manager = ((LocalizedWeatherWorld)world).localizedweather$getWeatherManager();
+            WeatherManager manager = ((LocalizedWeatherWorld) world).localizedweather$getWeatherManager();
 
             manager.addStorm(addStormS2C.storm());
         });
         ClientPlayNetworking.registerGlobalReceiver(RemoveStormS2C.ID, (removeStormS2C, clientPlayerEntity, packetSender) -> {
             World world = clientPlayerEntity.getWorld();
-            WeatherManager manager = ((LocalizedWeatherWorld)world).localizedweather$getWeatherManager();
+            WeatherManager manager = ((LocalizedWeatherWorld) world).localizedweather$getWeatherManager();
 
             manager.removeStormById(removeStormS2C.id());
         });
         ClientPlayNetworking.registerGlobalReceiver(ResetStormsS2C.ID, (resetStormsS2C, player, responseSender) -> {
-            WeatherManager manager = ((LocalizedWeatherWorld)player.getWorld()).localizedweather$getWeatherManager();
+            WeatherManager manager = ((LocalizedWeatherWorld) player.getWorld()).localizedweather$getWeatherManager();
             manager.getStorms()
-                    .stream()
-                    .mapToInt(Storm::getId)
-                    .forEach(manager::removeStormById);
+              .stream()
+              .mapToInt(Storm::getId)
+              .forEach(manager::removeStormById);
         });
 
-        if(this.enableDebugging) {
+        if (this.enableDebugging) {
             registerDebugEvents();
         }
     }
@@ -70,50 +70,50 @@ public class LocalizedWeatherClient implements ClientModInitializer {
                 float g = ((color >> 8) & 255) / 255.f;
                 float b = (color & 255) / 255.f;
                 WorldRenderer.drawBox(
-                        stack,
-                        buffer,
-                        pos.x + radius,
-                        world.getBottomY() - camera.getPos().getY(),
-                        pos.z - radius,
-                        pos.x - radius,
-                        world.getTopY() - camera.getPos().getY(),
-                        pos.z + radius,
-                        r,
-                        g,
-                        b,
-                        storm.getType() == StormType.THUNDER ? 1.0f : 0.25f
+                  stack,
+                  buffer,
+                  pos.x + radius,
+                  world.getBottomY() - camera.getPos().getY(),
+                  pos.z - radius,
+                  pos.x - radius,
+                  world.getTopY() - camera.getPos().getY(),
+                  pos.z + radius,
+                  r,
+                  g,
+                  b,
+                  storm.getType() == StormType.THUNDER ? 1.0f : 0.25f
                 );
             }
 
             // tmp
             // render all chunks in storm
             ChunkPos.stream(ChunkSectionPos.from(camera.getBlockPos()).toChunkPos(), 32)
-                    .forEach(pos -> {
-                        if(!manager.hasStormInChunk(pos, null))
-                            return;
-                        double startX = pos.getStartX() - camera.getPos().getX();
-                        double startZ = pos.getStartZ() - camera.getPos().getZ();
-                        double endX = pos.getEndX() - camera.getPos().getX() + 1;
-                        double endZ = pos.getEndZ() - camera.getPos().getZ() + 1;
+              .forEach(pos -> {
+                  if (!manager.hasStormInChunk(pos, null))
+                      return;
+                  double startX = pos.getStartX() - camera.getPos().getX();
+                  double startZ = pos.getStartZ() - camera.getPos().getZ();
+                  double endX = pos.getEndX() - camera.getPos().getX() + 1;
+                  double endZ = pos.getEndZ() - camera.getPos().getZ() + 1;
 
-                        float r = 1.f;
-                        float g = 0.86f;
-                        float b = 0.02f;
-                        WorldRenderer.drawBox(
-                                stack,
-                                buffer,
-                                startX,
-                                world.getBottomY() - camera.getPos().getY(),
-                                startZ,
-                                endX,
-                                world.getTopY() - camera.getPos().getY(),
-                                endZ,
-                                r,
-                                g,
-                                b,
-                                0.5f
-                        );
-                    });
+                  float r = 1.f;
+                  float g = 0.86f;
+                  float b = 0.02f;
+                  WorldRenderer.drawBox(
+                    stack,
+                    buffer,
+                    startX,
+                    world.getBottomY() - camera.getPos().getY(),
+                    startZ,
+                    endX,
+                    world.getTopY() - camera.getPos().getY(),
+                    endZ,
+                    r,
+                    g,
+                    b,
+                    0.5f
+                  );
+              });
         });
     }
 }

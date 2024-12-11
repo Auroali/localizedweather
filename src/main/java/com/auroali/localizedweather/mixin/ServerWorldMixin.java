@@ -40,14 +40,22 @@ import java.util.function.BooleanSupplier;
 
 @Mixin(ServerWorld.class)
 public abstract class ServerWorldMixin extends WorldMixin {
-    @Shadow @Final private ServerWorldProperties worldProperties;
+    @Shadow
+    @Final
+    private ServerWorldProperties worldProperties;
 
-    @Shadow public abstract List<ServerPlayerEntity> getPlayers();
+    @Shadow
+    public abstract List<ServerPlayerEntity> getPlayers();
 
-    @Shadow public abstract @Nullable ServerPlayerEntity getRandomAlivePlayer();
+    @Shadow
+    public abstract @Nullable ServerPlayerEntity getRandomAlivePlayer();
 
-    @Shadow @Final private MinecraftServer server;
-    @Shadow @Final private List<ServerPlayerEntity> players;
+    @Shadow
+    @Final
+    private MinecraftServer server;
+    @Shadow
+    @Final
+    private List<ServerPlayerEntity> players;
     @Unique
     private int localizedweather$lastStormSpawnTicks;
 
@@ -67,26 +75,26 @@ public abstract class ServerWorldMixin extends WorldMixin {
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;wakeSleepingPlayers()V"))
     public void localizedweather$handleClearingWeatherAfterSleep(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-        if(!this.getGameRules().getBoolean(GameRules.DO_WEATHER_CYCLE))
+        if (!this.getGameRules().getBoolean(GameRules.DO_WEATHER_CYCLE))
             return;
 
         Set<Storm> storms = new HashSet<>();
         this.players.stream().filter(PlayerEntity::isSleeping)
-                .forEach(player -> {
-                    for(Storm storm : this.localizedweather$weatherManager.getStorms()) {
-                        if(storm.isPositionInside(player.getPos()))
-                            storms.add(storm);
-                    }
-                });
+          .forEach(player -> {
+              for (Storm storm : this.localizedweather$weatherManager.getStorms()) {
+                  if (storm.isPositionInside(player.getPos()))
+                      storms.add(storm);
+              }
+          });
         storms.forEach(this.localizedweather$weatherManager::removeStorm);
     }
 
     @Inject(method = "tickWeather", at = @At("HEAD"), cancellable = true)
     public void localizedweather$tickWeather(CallbackInfo ci) {
         // reset stuff
-        if(this.worldProperties.isRaining())
+        if (this.worldProperties.isRaining())
             this.worldProperties.setRaining(false);
-        if(this.worldProperties.isThundering())
+        if (this.worldProperties.isThundering())
             this.worldProperties.setThundering(false);
 
         boolean canTickWeather = this.getGameRules().getBoolean(GameRules.DO_WEATHER_CYCLE);
@@ -94,34 +102,34 @@ public abstract class ServerWorldMixin extends WorldMixin {
         // tick existing storms
         Collection<Storm> storms = this.localizedweather$weatherManager.getStorms();
         List<Storm> toRemove = new ArrayList<>();
-        for(Storm storm : storms) {
+        for (Storm storm : storms) {
             Vec3d center = storm.getCenter();
             double radius = storm.getRadius();
-            if(canTickWeather)
+            if (canTickWeather)
                 storm.move(this.getRandom());
-            if(!storm.shouldRemove() && (!storm.getCenter().equals(center) || storm.getRadius() != radius)) {
+            if (!storm.shouldRemove() && (!storm.getCenter().equals(center) || storm.getRadius() != radius)) {
                 this.localizedweather$weatherManager.markDirty();
                 this.localizedweather$unsyncedStorms.add(storm);
             }
-            if(storm.shouldRemove())
+            if (storm.shouldRemove())
                 toRemove.add(storm);
         }
 
-        if(this.localizedweather$lastStormSpawnTicks > 0) {
+        if (this.localizedweather$lastStormSpawnTicks > 0) {
             this.localizedweather$lastStormSpawnTicks--;
         }
 
         // spawn new storms
-        for(int i = 0; i < MathHelper.clamp(this.getPlayers().size() / 4, 1, 8); i++) {
-            if(this.localizedweather$lastStormSpawnTicks != 0 || !canTickWeather || this.getRandom().nextInt(this.getGameRules().getInt(LocalizedWeather.STORM_SPAWN_CHANCE)) != 0)
+        for (int i = 0; i < MathHelper.clamp(this.getPlayers().size() / 4, 1, 8); i++) {
+            if (this.localizedweather$lastStormSpawnTicks != 0 || !canTickWeather || this.getRandom().nextInt(this.getGameRules().getInt(LocalizedWeather.STORM_SPAWN_CHANCE)) != 0)
                 continue;
 
             StormType type = this.getRandom().nextInt(8) == 0 ? StormType.THUNDER : StormType.RAIN;
             Vec3d candidateCenter = Vec3d.ZERO;
             PlayerEntity entity = this.getRandomAlivePlayer();
-            if(entity != null)
+            if (entity != null)
                 candidateCenter = entity.getPos();
-            
+
             int searchRadius = this.getGameRules().getInt(LocalizedWeather.STORM_SPAWN_RADIUS);
             double centerX = candidateCenter.getX() + this.getRandom().nextGaussian() * searchRadius;
             double centerZ = candidateCenter.getZ() + this.getRandom().nextGaussian() * searchRadius;
@@ -145,9 +153,9 @@ public abstract class ServerWorldMixin extends WorldMixin {
 
         // sync storms every 10 ticks
         // hopefully avoids packet spam
-        if(this.getTime() % 5 == 0) {
-            for(Storm storm : this.localizedweather$unsyncedStorms) {
-                if(storm.shouldRemove())
+        if (this.getTime() % 5 == 0) {
+            for (Storm storm : this.localizedweather$unsyncedStorms) {
+                if (storm.shouldRemove())
                     continue;
 
                 AddStormS2C packet = new AddStormS2C(storm);
@@ -159,7 +167,7 @@ public abstract class ServerWorldMixin extends WorldMixin {
         }
 
         // remove dead storms
-        for(Storm storm : toRemove) {
+        for (Storm storm : toRemove) {
             this.localizedweather$weatherManager.removeStorm(storm);
             LocalizedWeather.LOGGER.info("Removed storm at ({}, {})", storm.getCenter().getX(), storm.getCenter().getZ());
         }

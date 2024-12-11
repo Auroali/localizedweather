@@ -52,9 +52,9 @@ public class Storm {
 
     public void move(Random random) {
         this.center = this.center.add(this.direction);
-        if(this.decayChance == 0 || random.nextInt(this.decayChance) == 0)
+        if (this.decayChance == 0 || random.nextInt(this.decayChance) == 0)
             this.radius = this.radius - this.radius * this.radiusDecay;
-        if(this.radius == 0.d || this.ticksAlive++ > this.lifetime)
+        if (this.radius == 0.d || this.ticksAlive++ > this.lifetime)
             this.shouldRemove = true;
     }
 
@@ -75,7 +75,7 @@ public class Storm {
      * @return if the position is within the storm
      */
     public boolean isPositionInside(BlockPos pos) {
-        return pos.getSquaredDistanceFromCenter(this.center.getX(), pos.getY(), this.center.getZ()) <= this.radius*this.radius;
+        return pos.getSquaredDistanceFromCenter(this.center.getX(), pos.getY(), this.center.getZ()) <= this.radius * this.radius;
     }
 
     /**
@@ -83,7 +83,7 @@ public class Storm {
      * @return if the position is within the storm
      */
     public boolean isPositionInside(Vec3d pos) {
-        return pos.squaredDistanceTo(this.center.getX(), pos.getY(), this.center.getZ()) <= this.radius*this.radius;
+        return pos.squaredDistanceTo(this.center.getX(), pos.getY(), this.center.getZ()) <= this.radius * this.radius;
     }
 
     public NbtCompound write(NbtCompound compound) {
@@ -112,13 +112,13 @@ public class Storm {
         int lifetime = compound.getInt("Lifetime");
         int ticksAlive = compound.getInt("Age");
         Storm storm = new Storm(
-                type,
-                new Vec3d(centerX, 0, centerZ),
-                new Vec3d(directionX, 0, directionZ),
-                radius,
-                radiusDecay,
-                decayChance,
-                lifetime
+          type,
+          new Vec3d(centerX, 0, centerZ),
+          new Vec3d(directionX, 0, directionZ),
+          radius,
+          radiusDecay,
+          decayChance,
+          lifetime
         );
         storm.ticksAlive = ticksAlive;
         return storm;

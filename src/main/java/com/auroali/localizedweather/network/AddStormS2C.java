@@ -10,6 +10,7 @@ import net.minecraft.util.math.Vec3d;
 
 public record AddStormS2C(Storm storm) implements FabricPacket {
     public static PacketType<AddStormS2C> ID = PacketType.create(LocalizedWeather.id("add_storm_s2c"), AddStormS2C::read);
+
     public static AddStormS2C read(PacketByteBuf buf) {
         int id = buf.readVarInt();
         StormType type = StormType.values()[buf.readByte()];

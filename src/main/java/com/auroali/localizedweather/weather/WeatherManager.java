@@ -10,10 +10,12 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.nbt.*;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -45,7 +47,7 @@ public class WeatherManager {
     public void addStorm(Storm storm) {
         this.storms.put(storm.getId(), storm);
         StormEvents.SPAWN.invoker().onStormSpawn(this.world, this, storm);
-        if(this.world instanceof ServerWorld serverWorld) {
+        if (this.world instanceof ServerWorld serverWorld) {
             AddStormS2C packet = new AddStormS2C(storm);
             serverWorld.getPlayers().forEach(p -> ServerPlayNetworking.send(p, packet));
         }
@@ -58,12 +60,12 @@ public class WeatherManager {
 
     public void removeStormById(int id) {
         Storm storm = this.storms.get(id);
-        if(storm != null) {
+        if (storm != null) {
             storm.shouldRemove = true;
             StormEvents.REMOVED.invoker().onStormRemoved(this.world, this, storm);
         }
         this.storms.remove(id);
-        if(this.world instanceof ServerWorld serverWorld) {
+        if (this.world instanceof ServerWorld serverWorld) {
             RemoveStormS2C packet = new RemoveStormS2C(id);
             serverWorld.getPlayers().forEach(p -> ServerPlayNetworking.send(p, packet));
         }
@@ -71,16 +73,16 @@ public class WeatherManager {
     }
 
     public boolean isStormingAt(BlockPos pos) {
-        for(Storm storm : this.storms.values()) {
-            if(storm.isPositionInside(pos))
+        for (Storm storm : this.storms.values()) {
+            if (storm.isPositionInside(pos))
                 return true;
         }
         return false;
     }
 
     public boolean isStormingAt(Vec3d pos) {
-        for(Storm storm : this.storms.values()) {
-            if(storm.isPositionInside(pos))
+        for (Storm storm : this.storms.values()) {
+            if (storm.isPositionInside(pos))
                 return true;
         }
         return false;
@@ -88,14 +90,15 @@ public class WeatherManager {
 
     /**
      * Checks if a chunk has a storm
-     * @param pos the chunk's position
+     *
+     * @param pos  the chunk's position
      * @param type the type of storm
      * @return if the chunk has a storm
      * @apiNote if the storm type is null, any storm is checked
      */
     public boolean hasStormInChunk(ChunkPos pos, StormType type) {
-        for(Storm storm : this.storms.values()) {
-            if(type != null && storm.getType() != type)
+        for (Storm storm : this.storms.values()) {
+            if (type != null && storm.getType() != type)
                 continue;
 
             double minX = pos.getStartX();
@@ -108,9 +111,9 @@ public class WeatherManager {
             double stormBoundsMaxX = storm.getCenter().getX() + storm.getRadius();
             double stormBoundsMaxZ = storm.getCenter().getZ() + storm.getRadius();
 
-            if(maxX < stormBoundsMinX || minX > stormBoundsMaxX)
+            if (maxX < stormBoundsMinX || minX > stormBoundsMaxX)
                 continue;
-            if(maxZ < stormBoundsMinZ || minZ > stormBoundsMaxZ)
+            if (maxZ < stormBoundsMinZ || minZ > stormBoundsMaxZ)
                 continue;
 
             double stormX = storm.getCenter().getX();
@@ -121,14 +124,14 @@ public class WeatherManager {
             double edgeX = minX;
             double edgeZ = minZ;
 
-            if(Math.abs(maxX - stormX) < Math.abs(edgeX - stormX))
+            if (Math.abs(maxX - stormX) < Math.abs(edgeX - stormX))
                 edgeX = maxX;
-            if(Math.abs(maxZ - stormZ) < Math.abs(edgeZ - stormZ))
+            if (Math.abs(maxZ - stormZ) < Math.abs(edgeZ - stormZ))
                 edgeZ = maxZ;
 
             edgeX = stormX - edgeX;
             edgeZ = stormZ - edgeZ;
-            if((edgeX*edgeX)+(edgeZ*edgeZ) > radius*radius)
+            if ((edgeX * edgeX) + (edgeZ * edgeZ) > radius * radius)
                 continue;
 
             return true;
@@ -137,57 +140,57 @@ public class WeatherManager {
     }
 
     public boolean isThunderingAt(Vec3d pos) {
-        for(Storm storm : this.storms.values()) {
-            if(storm.getType() == StormType.THUNDER && storm.isPositionInside(pos))
+        for (Storm storm : this.storms.values()) {
+            if (storm.getType() == StormType.THUNDER && storm.isPositionInside(pos))
                 return true;
         }
         return false;
     }
 
     public boolean isRainingAt(Vec3d pos) {
-        for(Storm storm : this.storms.values()) {
-            if(storm.isPositionInside(pos))
+        for (Storm storm : this.storms.values()) {
+            if (storm.isPositionInside(pos))
                 return true;
         }
         return false;
     }
 
     public float getRainGradientAt(Vec3d pos) {
-        if(this.isRainingAt(pos))
+        if (this.isRainingAt(pos))
             return 1.0f;
         float falloff = 0.0f;
-        for(Storm storm : this.storms.values()) {
-            if(storm.getType() == StormType.RAIN)
+        for (Storm storm : this.storms.values()) {
+            if (storm.getType() == StormType.RAIN)
                 falloff = Math.max(falloff, this.calculateGradientFalloff(pos, storm));
         }
         return falloff;
     }
 
     public float getThunderGradientAt(Vec3d pos) {
-        if(this.isThunderingAt(pos))
+        if (this.isThunderingAt(pos))
             return 1.0f;
         float falloff = 0.0f;
-        for(Storm storm : this.storms.values()) {
-            if(storm.getType() == StormType.THUNDER)
+        for (Storm storm : this.storms.values()) {
+            if (storm.getType() == StormType.THUNDER)
                 falloff = Math.max(falloff, this.calculateGradientFalloff(pos, storm));
         }
         return falloff;
     }
 
     private float calculateGradientFalloff(Vec3d pos, Storm storm) {
-        double dist =  pos.squaredDistanceTo(storm.getCenter().getX(), pos.getY(), storm.getCenter().getZ()) - storm.getRadius()*storm.getRadius();
-        if(dist < 0)
+        double dist = pos.squaredDistanceTo(storm.getCenter().getX(), pos.getY(), storm.getCenter().getZ()) - storm.getRadius() * storm.getRadius();
+        if (dist < 0)
             return 0;
         dist = MathHelper.clamp(dist / FALLOFF_DISTANCE_SQUARED, 0.d, 1.d);
         return (float) (1 - dist) * (float) (1 - dist);
     }
 
     public void save(File saveFile, File backupFile) {
-        if(!this.needsSave)
+        if (!this.needsSave)
             return;
 
         NbtList storms = new NbtList();
-        for(Storm storm : this.storms.values()) {
+        for (Storm storm : this.storms.values()) {
             storms.add(storm.write(new NbtCompound()));
         }
 
@@ -206,7 +209,7 @@ public class WeatherManager {
     }
 
     public void read(File file, File backupFile) {
-        if(!file.exists())
+        if (!file.exists())
             return;
 
         NbtCompound compound;
@@ -214,7 +217,7 @@ public class WeatherManager {
             compound = NbtIo.readCompressed(stream);
         } catch (IOException e) {
             // we couldn't read the original file, so maybe the backup file will work?
-            if(backupFile != null && backupFile.exists()) {
+            if (backupFile != null && backupFile.exists()) {
                 LocalizedWeather.LOGGER.warn("Falling back to backup storms file for world {}", this.world.getRegistryKey().getValue());
                 this.read(backupFile, null);
                 return;
@@ -226,7 +229,7 @@ public class WeatherManager {
 
         // load all the storms
         NbtList storms = compound.getList("storms", NbtElement.COMPOUND_TYPE);
-        for(int i = 0; i < storms.size(); i++) {
+        for (int i = 0; i < storms.size(); i++) {
             Storm storm = Storm.fromNbt(storms.getCompound(i));
             this.storms.put(storm.getId(), storm);
         }

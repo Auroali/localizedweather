@@ -8,13 +8,13 @@ import net.minecraft.world.World;
 
 public class StormEvents {
     public static final Event<StormSpawn> SPAWN = EventFactory.createArrayBacked(StormSpawn.class, callbacks -> (world, manager, storm) -> {
-        for(StormSpawn callback : callbacks) {
+        for (StormSpawn callback : callbacks) {
             callback.onStormSpawn(world, manager, storm);
         }
     });
 
     public static final Event<StormRemoved> REMOVED = EventFactory.createArrayBacked(StormRemoved.class, callbacks -> (world, manager, storm) -> {
-        for(StormRemoved callback : callbacks) {
+        for (StormRemoved callback : callbacks) {
             callback.onStormRemoved(world, manager, storm);
         }
     });
