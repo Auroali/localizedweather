@@ -1,0 +1,10 @@
+{
+  "gamerule.localizedweather_stormChance": "Storm Chance",
+  "gamerule.localizedweather_stormChance.description": "The chance a storm can spawn, higher numbers means a lower spawn chance",
+  "gamerule.localizedweather_stormMaxRadius": "Max Storm Radius",
+  "gamerule.localizedweather_stormMinRadius": "Min Spawn Radius",
+  "gamerule.localizedweather_stormMaxSpawnDistance": "Storm Spawn Distance",
+  "gamerule.localizedweather_stormMaxSpawnDistance.description": "The maximum distance a storm is allowed to spawn from a player",
+  "gamerule.localizedweather_stormMinSpawnTime": "Storm Timer",
+  "gamerule.localizedweather_stormMinSpawnTime.description": "The minimum amount of time that must pass after a storm has spawned for the game to being rolling for spawns again, in ticks"
+}
