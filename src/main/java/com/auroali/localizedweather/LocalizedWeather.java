@@ -40,7 +40,6 @@ public class LocalizedWeather implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        // todo: allow sleeping during thunder/also clear rain on sleep
         ServerPlayConnectionEvents.JOIN.register((serverPlayNetworkHandler, packetSender, minecraftServer) -> {
             World world = serverPlayNetworkHandler.getPlayer().getWorld();
             WeatherManager weatherManager = ((LocalizedWeatherWorld) world).localizedweather$getWeatherManager();
