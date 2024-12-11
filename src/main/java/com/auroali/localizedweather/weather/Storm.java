@@ -30,26 +30,54 @@ public class Storm {
         this.lifetime = lifetime;
     }
 
+    /**
+     * Sets the numerical id of this storm
+     *
+     * @param id the new id
+     * @apiNote this should only be used before the storm is added to a weather manager, as part of syncing with the client
+     */
     public void setId(int id) {
         this.id = id;
     }
 
+    /**
+     * Returns the numerical id of this storm
+     * <br> This is not persisted between saves!
+     *
+     * @return the numerical id of this storm
+     */
     public int getId() {
         return this.id;
     }
 
+    /**
+     * @return the storm type
+     */
     public StormType getType() {
         return this.type;
     }
 
+    /**
+     * Gets the center of this storm
+     *
+     * @return the storm's center. The y component can be ignored
+     */
     public Vec3d getCenter() {
         return this.center;
     }
 
+    /**
+     * @return the radius of the storm, in blocks
+     */
     public double getRadius() {
         return this.radius;
     }
 
+    /**
+     * Process movement and radius decay logic
+     *
+     * @param random a random used for radius decay
+     */
     public void move(Random random) {
         this.center = this.center.add(this.direction);
         if (this.decayChance == 0 || random.nextInt(this.decayChance) == 0)
@@ -58,14 +86,27 @@ public class Storm {
             this.shouldRemove = true;
     }
 
+    /**
+     * @return if this storm should be removed
+     */
     public boolean shouldRemove() {
         return this.shouldRemove;
     }
 
+    /**
+     * Sets the storm's center
+     *
+     * @param pos the new center
+     */
     public void setCenter(Vec3d pos) {
         this.center = pos;
     }
 
+    /**
+     * Sets the storm's radius
+     *
+     * @param radius the new radius
+     */
     public void setRadius(double radius) {
         this.radius = radius;
     }

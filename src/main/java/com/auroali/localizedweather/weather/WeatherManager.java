@@ -44,6 +44,12 @@ public class WeatherManager {
         return this.needsSave;
     }
 
+    /**
+     * Adds a storm
+     *
+     * @param storm the storm to add
+     * @apiNote this is also responsible for handling the SPAWN storm event and client syncing
+     */
     public void addStorm(Storm storm) {
         this.storms.put(storm.getId(), storm);
         StormEvents.SPAWN.invoker().onStormSpawn(this.world, this, storm);
@@ -54,10 +60,22 @@ public class WeatherManager {
         this.markDirty();
     }
 
+    /**
+     * Removes a storm
+     *
+     * @param storm the storm to remove
+     * @see WeatherManager#removeStormById(int)
+     */
     public void removeStorm(Storm storm) {
         this.removeStormById(storm.getId());
     }
 
+    /**
+     * Removes a storm by its numerical id
+     *
+     * @param id the storm's id
+     * @apiNote this is also responsible for handling the REMOVED storm event and client syncing
+     */
     public void removeStormById(int id) {
         Storm storm = this.storms.get(id);
         if (storm != null) {
@@ -72,6 +90,12 @@ public class WeatherManager {
         this.markDirty();
     }
 
+    /**
+     * Checks if there is at least one storm of any type at the given block position
+     *
+     * @param pos the position to check
+     * @return if a storm is present
+     */
     public boolean isStormingAt(BlockPos pos) {
         for (Storm storm : this.storms.values()) {
             if (storm.isPositionInside(pos))
@@ -80,6 +104,12 @@ public class WeatherManager {
         return false;
     }
 
+    /**
+     * Checks if there is at least one storm of any type at the given position
+     *
+     * @param pos the position to check
+     * @return if a storm is present
+     */
     public boolean isStormingAt(Vec3d pos) {
         for (Storm storm : this.storms.values()) {
             if (storm.isPositionInside(pos))
@@ -89,7 +119,7 @@ public class WeatherManager {
     }
 
     /**
-     * Checks if a chunk has a storm
+     * Checks if a chunk has a storm of a certain type
      *
      * @param pos  the chunk's position
      * @param type the type of storm
@@ -139,6 +169,12 @@ public class WeatherManager {
         return false;
     }
 
+    /**
+     * Check if it is thundering at the given position
+     *
+     * @param pos the position to check
+     * @return if there is at least one storm of type THUNDER at the given position
+     */
     public boolean isThunderingAt(Vec3d pos) {
         for (Storm storm : this.storms.values()) {
             if (storm.getType() == StormType.THUNDER && storm.isPositionInside(pos))
@@ -147,16 +183,15 @@ public class WeatherManager {
         return false;
     }
 
-    public boolean isRainingAt(Vec3d pos) {
-        for (Storm storm : this.storms.values()) {
-            if (storm.isPositionInside(pos))
-                return true;
-        }
-        return false;
-    }
-
+    /**
+     * Returns the rain gradient at the given position
+     *
+     * @param pos the position to check
+     * @return the rain gradient
+     * @apiNote this is typically only used by the client
+     */
     public float getRainGradientAt(Vec3d pos) {
-        if (this.isRainingAt(pos))
+        if (this.isStormingAt(pos))
             return 1.0f;
         float falloff = 0.0f;
         for (Storm storm : this.storms.values()) {
@@ -166,6 +201,13 @@ public class WeatherManager {
         return falloff;
     }
 
+    /**
+     * Returns the thunder gradient at the given position
+     *
+     * @param pos the position to check
+     * @return the thunder gradient
+     * @apiNote this is typically only used by the client
+     */
     public float getThunderGradientAt(Vec3d pos) {
         if (this.isThunderingAt(pos))
             return 1.0f;
@@ -185,6 +227,12 @@ public class WeatherManager {
         return (float) (1 - dist) * (float) (1 - dist);
     }
 
+    /**
+     * Save this manager to the disk
+     *
+     * @param saveFile   the file to write to
+     * @param backupFile the backup file
+     */
     public void save(File saveFile, File backupFile) {
         if (!this.needsSave)
             return;
@@ -208,6 +256,12 @@ public class WeatherManager {
         }
     }
 
+    /**
+     * Load all storms from disk into this manager
+     *
+     * @param file       the file to read
+     * @param backupFile the file to fall back on if the first failed to read
+     */
     public void read(File file, File backupFile) {
         if (!file.exists())
             return;

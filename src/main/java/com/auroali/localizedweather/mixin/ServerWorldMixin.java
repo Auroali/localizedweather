@@ -50,12 +50,6 @@ public abstract class ServerWorldMixin extends WorldMixin {
     @Shadow
     public abstract @Nullable ServerPlayerEntity getRandomAlivePlayer();
 
-    @Shadow
-    @Final
-    private MinecraftServer server;
-    @Shadow
-    @Final
-    private List<ServerPlayerEntity> players;
     @Unique
     private int localizedweather$lastStormSpawnTicks;
 
@@ -73,19 +67,22 @@ public abstract class ServerWorldMixin extends WorldMixin {
         this.localizedweather$weatherManager.read(this.localizedweather$stormSaveFile, this.localizedweather$stormBackupFile);
     }
 
+    // handle clearing storms after sleeping
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;wakeSleepingPlayers()V"))
     public void localizedweather$handleClearingWeatherAfterSleep(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
         if (!this.getGameRules().getBoolean(GameRules.DO_WEATHER_CYCLE))
             return;
 
+        // get all storms players slept in
         Set<Storm> storms = new HashSet<>();
-        this.players.stream().filter(PlayerEntity::isSleeping)
+        this.getPlayers().stream().filter(PlayerEntity::isSleeping)
           .forEach(player -> {
               for (Storm storm : this.localizedweather$weatherManager.getStorms()) {
                   if (storm.isPositionInside(player.getPos()))
                       storms.add(storm);
               }
           });
+        // remove them
         storms.forEach(this.localizedweather$weatherManager::removeStorm);
     }
 
@@ -115,6 +112,7 @@ public abstract class ServerWorldMixin extends WorldMixin {
                 toRemove.add(storm);
         }
 
+        // tick the storm timer
         if (this.localizedweather$lastStormSpawnTicks > 0) {
             this.localizedweather$lastStormSpawnTicks--;
         }
@@ -181,6 +179,7 @@ public abstract class ServerWorldMixin extends WorldMixin {
         this.localizedweather$weatherManager.save(this.localizedweather$stormSaveFile, this.localizedweather$stormBackupFile);
     }
 
+    // fix chunks not processing weather logic due to an isRaining check
     @WrapOperation(method = "tickChunk", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;isThundering()Z"))
     public boolean localizedweather$modifyThunderCheck(ServerWorld instance, Operation<Boolean> original, @Local(argsOnly = true) WorldChunk chunk) {
         return this.localizedweather$weatherManager.hasStormInChunk(chunk.getPos(), StormType.THUNDER);

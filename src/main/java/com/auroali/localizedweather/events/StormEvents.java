@@ -7,12 +7,18 @@ import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.world.World;
 
 public class StormEvents {
+    /**
+     * Invoked immediately after a storm is added to a WeatherManager, but before it is sent to the client
+     */
     public static final Event<StormSpawn> SPAWN = EventFactory.createArrayBacked(StormSpawn.class, callbacks -> (world, manager, storm) -> {
         for (StormSpawn callback : callbacks) {
             callback.onStormSpawn(world, manager, storm);
         }
     });
 
+    /**
+     * Invoked immediately before a storm is removed from a WeatherManager
+     */
     public static final Event<StormRemoved> REMOVED = EventFactory.createArrayBacked(StormRemoved.class, callbacks -> (world, manager, storm) -> {
         for (StormRemoved callback : callbacks) {
             callback.onStormRemoved(world, manager, storm);

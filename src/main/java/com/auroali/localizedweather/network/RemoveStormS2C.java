@@ -5,6 +5,11 @@ import net.fabricmc.fabric.api.networking.v1.FabricPacket;
 import net.fabricmc.fabric.api.networking.v1.PacketType;
 import net.minecraft.network.PacketByteBuf;
 
+/**
+ * Tells the client to remove a storm with the given id
+ *
+ * @param id the id of the storm to remove
+ */
 public record RemoveStormS2C(int id) implements FabricPacket {
     public static PacketType<RemoveStormS2C> ID = PacketType.create(LocalizedWeather.id("remove_storm_s2c"), RemoveStormS2C::new);
 

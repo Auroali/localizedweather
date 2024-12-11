@@ -2,7 +2,6 @@ package com.auroali.localizedweather;
 
 import com.auroali.localizedweather.network.AddStormS2C;
 import com.auroali.localizedweather.network.RemoveStormS2C;
-import com.auroali.localizedweather.network.ResetStormsS2C;
 import com.auroali.localizedweather.weather.LocalizedWeatherWorld;
 import com.auroali.localizedweather.weather.Storm;
 import com.auroali.localizedweather.weather.StormType;
@@ -34,13 +33,6 @@ public class LocalizedWeatherClient implements ClientModInitializer {
             WeatherManager manager = ((LocalizedWeatherWorld) world).localizedweather$getWeatherManager();
 
             manager.removeStormById(removeStormS2C.id());
-        });
-        ClientPlayNetworking.registerGlobalReceiver(ResetStormsS2C.ID, (resetStormsS2C, player, responseSender) -> {
-            WeatherManager manager = ((LocalizedWeatherWorld) player.getWorld()).localizedweather$getWeatherManager();
-            manager.getStorms()
-              .stream()
-              .mapToInt(Storm::getId)
-              .forEach(manager::removeStormById);
         });
 
         if (this.enableDebugging) {

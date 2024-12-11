@@ -3,7 +3,6 @@ package com.auroali.localizedweather;
 import com.auroali.localizedweather.commands.LocalizedWeatherCommand;
 import com.auroali.localizedweather.commands.arguments.StormTypeArgumentType;
 import com.auroali.localizedweather.network.AddStormS2C;
-import com.auroali.localizedweather.network.ResetStormsS2C;
 import com.auroali.localizedweather.weather.LocalizedWeatherWorld;
 import com.auroali.localizedweather.weather.Storm;
 import com.auroali.localizedweather.weather.WeatherManager;
@@ -49,24 +48,26 @@ public class LocalizedWeather implements ModInitializer {
             }
         });
 
+        // sync storms when a player changes dimensions
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, origin, destination) -> {
-            ServerPlayNetworking.send(player, new ResetStormsS2C());
             WeatherManager manager = ((LocalizedWeatherWorld) player.getWorld()).localizedweather$getWeatherManager();
             for (Storm storm : manager.getStorms()) {
                 ServerPlayNetworking.send(player, new AddStormS2C(storm));
             }
         });
 
+        // AFTER_PLAYER_CHANGE_WORLD doesn't fire for respawning in a different dimension
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, player, alive) -> {
+            // if the player respawned in the same dimension they died in, we don't need to do anything
             if (player.getServerWorld() == oldPlayer.getServerWorld())
                 return;
-            ServerPlayNetworking.send(player, new ResetStormsS2C());
             WeatherManager manager = ((LocalizedWeatherWorld) player.getWorld()).localizedweather$getWeatherManager();
             for (Storm storm : manager.getStorms()) {
                 ServerPlayNetworking.send(player, new AddStormS2C(storm));
             }
         });
 
+        // allow sleeping if the player is in a thunder storm
         EntitySleepEvents.ALLOW_SLEEP_TIME.register((player, pos, vanillaResult) -> {
             WeatherManager manager = ((LocalizedWeatherWorld) player.getWorld()).localizedweather$getWeatherManager();
             return manager.isThunderingAt(player.getPos()) ? ActionResult.SUCCESS : ActionResult.PASS;
